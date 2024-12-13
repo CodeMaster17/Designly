@@ -5,4 +5,5 @@ export const message = {
   PASSWORD_MUST_BE_8_CHARACTERS: "Password must be at least 8 characters",
   PASSWORD_MUST_BE_AT_MOST_32_CHARACTERS:
     "Password must be at most 32 characters",
+  USER_ALREADY_EXISTS: "User already exists",
 };
