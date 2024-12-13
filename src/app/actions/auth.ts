@@ -2,10 +2,31 @@
 
 import { message } from "@/constants/message";
 import { signUpSchema } from "@/schema";
+import { signIn } from "@/server/auth";
 import { db } from "@/server/db";
 import bcrypt from "bcryptjs";
+import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
 import { ZodError } from "zod";
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn("credentials", formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case "CredentialsSignin":
+          return message.INVALID_CREDENTIALS;
+        default:
+          return message.SOMETHING_WENT_WRONG;
+      }
+    }
+    throw error;
+  }
+}
 
 export async function register(
   prevState: string | undefined,
