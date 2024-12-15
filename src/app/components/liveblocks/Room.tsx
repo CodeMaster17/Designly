@@ -27,6 +27,7 @@ export function Room({ children, roomId }: { children: React.ReactNode, roomId: 
                 }}
             >
                 <ClientSideSuspense
+                    // Fallback UI while the room is loading
                     fallback={
                         <div className="flex h-screen flex-col items-center justify-center gap-2">
                             <img
