@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     },
   });
 
-  session.allow(`room:${"testing"}:`, session.FULL_ACCESS);
+  session.allow(`testing`, session.FULL_ACCESS);
 
   const { status, body } = await session.authorize();
 
