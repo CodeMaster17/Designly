@@ -22,6 +22,9 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
+    "@liveblocks/client": "^2.14.0",
+    "@liveblocks/node": "^2.14.0",
+    "@liveblocks/react": "^2.14.0",
     "@t3-oss/env-nextjs": "^0.10.1",
     "bcryptjs": "^2.4.3",
     "geist": "^1.3.0",
