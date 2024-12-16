@@ -4,6 +4,7 @@ import { LayerType } from "@/types/types";
 import { colorToCss } from "@/utils";
 import Path from "./Path";
 import Rectangle from "./Rectangle";
+import Ellipse from "./Ellipse";
 
 
 const LayerComponent = memo(
@@ -35,14 +36,16 @@ const LayerComponent = memo(
             case LayerType.Rectangle:
                 return (
                     <Rectangle
-                    //  onPointerDown={onLayerPointerDown} 
-                     id={id} layer={layer} />
-                     
+                        //  onPointerDown={onLayerPointerDown} 
+                        id={id} layer={layer} />
+
                 );
-            // case LayerType.Ellipse:
-            //     return (
-            //         <Ellipse onPointerDown={onLayerPointerDown} id={id} layer={layer} />
-            //     );
+            case LayerType.Ellipse:
+                return (
+                    <Ellipse
+                        // onPointerDown={onLayerPointerDown} 
+                        id={id} layer={layer} />
+                );
             // case LayerType.Text:
             //     return (
             //         <Text onPointerDown={onLayerPointerDown} id={id} layer={layer} />

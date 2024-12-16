@@ -3,7 +3,7 @@
 import { colorToCss, pointerEventToCanvasPoint } from "@/utils"
 import { useMutation, useStorage } from "@liveblocks/react"
 import LayerComponent from "./LayerComponent";
-import { Camera, CanvasMode, CanvasState, Layer, LayerType, Point } from "@/types/types";
+import { Camera, CanvasMode, CanvasState, EllipseLayer, Layer, LayerType, Point, TextLayer } from "@/types/types";
 import { nanoid } from 'nanoid'
 import { LiveObject } from "@liveblocks/client";
 import { useEffect, useState } from "react";
@@ -62,6 +62,32 @@ const Canvas = () => {
                     opacity: 100,
                     cornerRadius: 0,
                 })
+            } else if (layerType === LayerType.Ellipse) {
+                layer = new LiveObject<EllipseLayer>({
+                    type: LayerType.Ellipse,
+                    x: position.x,
+                    y: position.y,
+                    height: 100,
+                    width: 100,
+                    fill: { r: 217, g: 217, b: 217 },
+                    stroke: { r: 217, g: 217, b: 217 },
+                    opacity: 100,
+                });
+            } else if (layerType === LayerType.Text) {
+                layer = new LiveObject<TextLayer>({
+                    type: LayerType.Text,
+                    x: position.x,
+                    y: position.y,
+                    height: 100,
+                    width: 100,
+                    fontSize: 16,
+                    text: "Text",
+                    fontWeight: 400,
+                    fontFamily: "Inter",
+                    stroke: { r: 217, g: 217, b: 217 },
+                    fill: { r: 217, g: 217, b: 217 },
+                    opacity: 100,
+                });
             }
 
             if (layer) {
@@ -104,7 +130,7 @@ const Canvas = () => {
             //     setState({ mode: CanvasMode.None });
             // }
             // history.resume();
-            insertLayer(LayerType.Rectangle, { x: 220, y: 600 })
+            insertLayer(LayerType.Ellipse, point)
         },
         [canvasState, setState, history, insertLayer],
     );
