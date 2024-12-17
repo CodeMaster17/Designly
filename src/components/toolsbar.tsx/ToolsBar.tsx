@@ -1,5 +1,6 @@
-import { CanvasMode, CanvasState } from "@/types/types";
+import { CanvasMode, CanvasState, LayerType } from "@/types/types";
 import SelectionButton from "./SelectionButton";
+import ShapeSelectionButton from "./ShapeSelectionButton";
 
 interface ToolsBarProps {
     canvasState: CanvasState;
@@ -44,6 +45,18 @@ const ToolsBar = ({ canvasState,
                                 ? { mode: canvasMode, origin: null }
                                 : { mode: canvasMode },
                         )
+                    }
+                />
+                <ShapeSelectionButton
+                    isActive={
+                        canvasState.mode === CanvasMode.Inserting &&
+                        [LayerType.Rectangle, LayerType.Ellipse].includes(
+                            canvasState.layerType,
+                        )
+                    }
+                    canvasState={canvasState}
+                    onClick={(layerType) =>
+                        setCanvasState({ mode: CanvasMode.Inserting, layerType })
                     }
                 />
             </div>
