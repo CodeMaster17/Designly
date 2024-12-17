@@ -7,6 +7,7 @@ import { Camera, CanvasMode, CanvasState, EllipseLayer, Layer, LayerType, Point,
 import { nanoid } from 'nanoid'
 import { LiveObject } from "@liveblocks/client";
 import { useEffect, useState } from "react";
+import ToolsBar from "../toolsbar.tsx/ToolsBar";
 
 const MAX_LAYERS = 100;
 
@@ -22,15 +23,15 @@ const Canvas = () => {
     const layerIds = useStorage((state) => state.layerIds)
     const liveLayers = useStorage((state) => state.layers);
 
+    const [camera, setCamera] = useState<Camera>({ x: 0, y: 0, zoom: 1 });
+
+    // for selecting the type of shape to insert
     const [canvasState, setState] = useState<CanvasState>({
         mode: CanvasMode.None,
     });
-    const [camera, setCamera] = useState<Camera>({ x: 0, y: 0, zoom: 1 });
+
 
     // to handle the insertion of a rectangle layer on click of mouse
-
-
-
     const insertLayer = useMutation(
         (
             { storage, setMyPresence },
@@ -98,14 +99,6 @@ const Canvas = () => {
         },
         []
     )
-    // useEffect(() => {
-    //     if (!layerIds) {
-    //         console.warn("Storage is not ready yet!");
-    //         return;
-    //     }
-    //     insertLayer(LayerType.Rectangle, { x: 100, y: 100 })
-    // }, []);
-
 
 
     const onPointerUp = useMutation(
@@ -159,6 +152,8 @@ const Canvas = () => {
                     </svg>
                 </div>
             </main>
+            {/* toolbar */}
+            <ToolsBar canvasState={canvasState} setCanvasState={(newState) => setState(newState)} />
         </div>
     )
 }
