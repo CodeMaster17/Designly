@@ -5,14 +5,14 @@ import ShapeSelectionButton from "./ShapeSelectionButton";
 interface ToolsBarProps {
     canvasState: CanvasState;
     setCanvasState: (newState: CanvasState) => void;
-    zoomIn: () => void;
-    zoomOut: () => void;
-    canZoomIn: boolean;
-    canZoomOut: boolean;
-    canUndo: boolean;
-    canRedo: boolean;
-    undo: () => void;
-    redo: () => void;
+    // zoomIn: () => void;
+    // zoomOut: () => void;
+    // canZoomIn: boolean;
+    // canZoomOut: boolean;
+    // canUndo: boolean;
+    // canRedo: boolean;
+    // undo: () => void;
+    // redo: () => void;
 }
 
 const ToolsBar = ({ canvasState,
