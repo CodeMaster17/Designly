@@ -1,13 +1,13 @@
 'use client'
 
-import { colorToCss, pointerEventToCanvasPoint } from "@/utils"
-import { useMutation, useStorage } from "@liveblocks/react"
-import LayerComponent from "./LayerComponent";
 import { Camera, CanvasMode, CanvasState, EllipseLayer, Layer, LayerType, Point, TextLayer } from "@/types/types";
-import { nanoid } from 'nanoid'
+import { colorToCss, pointerEventToCanvasPoint } from "@/utils";
 import { LiveObject } from "@liveblocks/client";
-import { useEffect, useState } from "react";
+import { useMutation, useStorage } from "@liveblocks/react";
+import { nanoid } from 'nanoid';
+import { useCallback, useState } from "react";
 import ToolsBar from "../toolsbar.tsx/ToolsBar";
+import LayerComponent from "./LayerComponent";
 
 const MAX_LAYERS = 100;
 
@@ -23,12 +23,14 @@ const Canvas = () => {
     const layerIds = useStorage((state) => state.layerIds)
     const liveLayers = useStorage((state) => state.layers);
 
+    // for zoom in zoom out
     const [camera, setCamera] = useState<Camera>({ x: 0, y: 0, zoom: 1 });
 
     // for selecting the type of shape to insert
     const [canvasState, setState] = useState<CanvasState>({
         mode: CanvasMode.None,
     });
+
 
 
     // to handle the insertion of a rectangle layer on click of mouse
@@ -128,6 +130,15 @@ const Canvas = () => {
     );
 
 
+    // on wheel
+    const onWheel = useCallback((e: React.WheelEvent) => {
+        setCamera((camera) => ({
+            x: camera.x - e.deltaX,
+            y: camera.y - e.deltaY,
+            zoom: camera.zoom,
+        }));
+    }, []);
+
 
     return (
         <div className="flex h-screen w-full">
@@ -138,8 +149,15 @@ const Canvas = () => {
                     }}
                     className="h-full w-full touch-none"
                 >
-                    <svg className="h-full w-full" onPointerUp={onPointerUp}>
-                        <g>
+                    <svg className="h-full w-full" onPointerUp={onPointerUp} 
+                    onWheel={onWheel}
+                    >
+                        <g
+                            style={{
+                                transform: `translate(${camera.x}px, ${camera.y}px) scale(${camera.zoom})`,
+                            }}
+
+                        >
                             {layerIds?.map((layerId) => (
                                 <LayerComponent
                                     key={layerId}
@@ -151,8 +169,21 @@ const Canvas = () => {
                     </svg>
                 </div>
             </main>
+
+
             {/* toolbar */}
-            <ToolsBar canvasState={canvasState} setCanvasState={(newState) => setState(newState)} />
+            <ToolsBar
+                canvasState={canvasState}
+                setCanvasState={(newState) => setState(newState)}
+                zoomIn={() => {
+                    setCamera((camera) => ({ ...camera, zoom: camera.zoom + 0.1 }));
+                }}
+                zoomOut={() => {
+                    setCamera((camera) => ({ ...camera, zoom: camera.zoom - 0.1 }));
+                }}
+                canZoomIn={camera.zoom < 2}
+                canZoomOut={camera.zoom > 0.5}
+            />
         </div>
     )
 }

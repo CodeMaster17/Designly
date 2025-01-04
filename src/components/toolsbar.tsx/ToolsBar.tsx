@@ -1,14 +1,16 @@
 import { CanvasMode, CanvasState, LayerType } from "@/types/types";
 import SelectionButton from "./SelectionButton";
 import ShapeSelectionButton from "./ShapeSelectionButton";
+import ZoomInButton from "./ZoomInButton";
+import ZoomOutButton from "./ZoomOutButton";
 
 interface ToolsBarProps {
     canvasState: CanvasState;
     setCanvasState: (newState: CanvasState) => void;
-    // zoomIn: () => void;
-    // zoomOut: () => void;
-    // canZoomIn: boolean;
-    // canZoomOut: boolean;
+    zoomIn: () => void;
+    zoomOut: () => void;
+    canZoomIn: boolean;
+    canZoomOut: boolean;
     // canUndo: boolean;
     // canRedo: boolean;
     // undo: () => void;
@@ -17,10 +19,10 @@ interface ToolsBarProps {
 
 const ToolsBar = ({ canvasState,
     setCanvasState,
-    // zoomIn,
-    // zoomOut,
-    // canZoomIn,
-    // canZoomOut,
+    zoomIn,
+    zoomOut,
+    canZoomIn,
+    canZoomOut,
     // canUndo,
     // canRedo,
     // undo,
@@ -59,6 +61,11 @@ const ToolsBar = ({ canvasState,
                         setCanvasState({ mode: CanvasMode.Inserting, layerType })
                     }
                 />
+                <div className="w-[1px] self-stretch bg-black/10" />
+                <div className="flex items-center justify-center">
+                    <ZoomInButton onClick={zoomIn} disabled={!canZoomIn} />
+                    <ZoomOutButton onClick={zoomOut} disabled={!canZoomOut} />
+                </div>
             </div>
         </div>
     )
