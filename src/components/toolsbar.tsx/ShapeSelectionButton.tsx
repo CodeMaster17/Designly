@@ -53,6 +53,8 @@ const ShapeSelectionButton = ({
                         <IoEllipseOutline className="h-5 w-5" />
                     )}
             </IconButton>
+
+            {/* opening button */}
             <button onClick={() => setIsOpen(!isOpen)} className="ml-1 rotate-180">
                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                     <path
@@ -61,8 +63,11 @@ const ShapeSelectionButton = ({
                     />
                 </svg>
             </button>
+
             {isOpen && (
                 <div className="absolute -top-20 mt-1 min-w-[150px] rounded-xl bg-[#1e1e1e] p-2 shadow-lg">
+
+                    {/* Rectangle button */}
                     <button
                         className={`flex w-full items-center rounded-md p-1 text-white hover:bg-blue-500 ${canvasState.mode === CanvasMode.Inserting && canvasState.layerType === LayerType.Rectangle ? "bg-blue-500" : ""}`}
                         onClick={() => handleClick(LayerType.Rectangle)}
@@ -75,6 +80,8 @@ const ShapeSelectionButton = ({
                         <IoSquareOutline className="mr-2 h-4 w-4" />
                         <span className="text-xs">Rectangle</span>
                     </button>
+
+                    {/* Ellipse button */}
                     <button
                         className={`flex w-full items-center rounded-md p-1 text-white hover:bg-blue-500 ${canvasState.mode === CanvasMode.Inserting && canvasState.layerType === LayerType.Ellipse ? "bg-blue-500" : ""}`}
                         onClick={() => handleClick(LayerType.Ellipse)}

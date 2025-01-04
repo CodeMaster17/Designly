@@ -107,23 +107,22 @@ const Canvas = () => {
 
             const point = pointerEventToCanvasPoint(e, camera);
 
-            // if (
-            //     canvasState.mode === CanvasMode.None ||
-            //     canvasState.mode === CanvasMode.Pressing
-            // ) {
-            //     unselectLayers();
-            //     setState({ mode: CanvasMode.None });
-            // } else if (canvasState.mode === CanvasMode.Inserting) {
-            //     insertLayer(canvasState.layerType, point);
-            // } else if (canvasState.mode === CanvasMode.Dragging) {
-            //     setState({ mode: CanvasMode.Dragging, origin: null });
-            // } else if (canvasState.mode === CanvasMode.Pencil) {
-            //     insertPath();
-            // } else {
-            //     setState({ mode: CanvasMode.None });
-            // }
+            if (
+                canvasState.mode === CanvasMode.None ||
+                canvasState.mode === CanvasMode.Pressing
+            ) {
+                // unselectLayers();
+                setState({ mode: CanvasMode.None });
+            } else if (canvasState.mode === CanvasMode.Inserting) {
+                insertLayer(canvasState.layerType, point);
+            } else if (canvasState.mode === CanvasMode.Dragging) {
+                setState({ mode: CanvasMode.Dragging, origin: null });
+            } else if (canvasState.mode === CanvasMode.Pencil) {
+                // insertPath();
+            } else {
+                setState({ mode: CanvasMode.None });
+            }
             // history.resume();
-            insertLayer(LayerType.Ellipse, point)
         },
         [canvasState, setState, history, insertLayer],
     );
