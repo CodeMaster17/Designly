@@ -140,6 +140,25 @@ const Canvas = () => {
     }, []);
 
 
+    const onPointerDown = useMutation(
+        ({ }, e: React.PointerEvent) => {
+            const point = pointerEventToCanvasPoint(e, camera);
+
+            if (canvasState.mode === CanvasMode.Dragging) {
+                setState({ mode: CanvasMode.Dragging, origin: point });
+                return;
+            }
+
+            if (canvasState.mode === CanvasMode.Inserting) return;
+
+
+            setState({ origin: point, mode: CanvasMode.Pressing });
+        },
+        [camera, canvasState.mode, setState],
+    );
+
+
+
     return (
         <div className="flex h-screen w-full">
             <main className="fixed left-0 right-0 h-screen overflow-y-auto">
@@ -149,8 +168,9 @@ const Canvas = () => {
                     }}
                     className="h-full w-full touch-none"
                 >
-                    <svg className="h-full w-full" onPointerUp={onPointerUp} 
-                    onWheel={onWheel}
+                    <svg className="h-full w-full" onPointerUp={onPointerUp}
+                        onWheel={onWheel}
+                        onPointerDown={onPointerDown}
                     >
                         <g
                             style={{
