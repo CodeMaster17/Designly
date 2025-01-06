@@ -40,3 +40,16 @@ export const pointerEventToCanvasPoint = (
     y: Math.round(e.clientY) - camera.y,
   };
 };
+
+// export function findIntersectionLayersWithRectangle(
+//   layerIds: readonly string[],
+//   layers: ReadonlyMap<string, Layer>,
+//   a: Point,
+//   b: Point,
+// ) {
+//   const rect = {
+//     x: Math.min(a.x, b.x),
+//     y: Math.min(a.y, b.y),
+//     width: Math.abs(a.x - b.x),
+//     height: Math.abs(a.y - b.y),
+//   };

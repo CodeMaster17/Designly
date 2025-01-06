@@ -157,7 +157,62 @@ const Canvas = () => {
         [camera, canvasState.mode, setState],
     );
 
+    const startMultiSelection = useCallback((current: Point, origin: Point) => {
+        if (Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) > 5) {
+            setState({ mode: CanvasMode.SelectionNet, origin, current });
+        }
+    }, []);
 
+    const updateSelectionNet = useMutation(
+        ({ storage, setMyPresence }, current: Point, origin: Point) => {
+            if (layerIds) {
+                const layers = storage.get("layers").toImmutable();
+                setState({
+                    mode: CanvasMode.SelectionNet,
+                    origin,
+                    current,
+                });
+                // const ids = findIntersectionLayersWithRectangle(
+                //     layerIds,
+                //     layers,
+                //     origin,
+                //     current,
+                // );
+                // setMyPresence({ selection: ids });
+            }
+        },
+        [layerIds],
+    );
+
+    const onPointerMove = useMutation(
+        ({ setMyPresence }, e: React.PointerEvent) => {
+            const point = pointerEventToCanvasPoint(e, camera);
+            if (canvasState.mode === CanvasMode.Pressing) {
+                startMultiSelection(point, canvasState.origin);
+            } else if (canvasState.mode === CanvasMode.SelectionNet) {
+                updateSelectionNet(point, canvasState.origin);
+            } else if (
+                canvasState.mode === CanvasMode.Dragging &&
+                canvasState.origin !== null
+            ) {
+                const deltaX = e.movementX;
+                const deltaY = e.movementY;
+
+                setCamera((camera) => ({
+                    x: camera.x + deltaX,
+                    y: camera.y + deltaY,
+                    zoom: camera.zoom,
+                }));
+            } else if (canvasState.mode === CanvasMode.Translating) {
+                // translateSelectedLayers(point);
+            } else if (canvasState.mode === CanvasMode.Pencil) {
+                // continueDrawing(point, e);
+            } else if (canvasState.mode === CanvasMode.Resizing) {
+                // resizeSelectedLayer(point);
+            }
+            setMyPresence({ cursor: point });
+        }, []
+    )
 
     return (
         <div className="flex h-screen w-full">
@@ -171,6 +226,7 @@ const Canvas = () => {
                     <svg className="h-full w-full" onPointerUp={onPointerUp}
                         onWheel={onWheel}
                         onPointerDown={onPointerDown}
+                        onPointerMove={onPointerMove}
                     >
                         <g
                             style={{
