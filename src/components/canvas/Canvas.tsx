@@ -3,7 +3,7 @@
 import { Camera, CanvasMode, CanvasState, EllipseLayer, Layer, LayerType, Point, TextLayer } from "@/types/types";
 import { colorToCss, pointerEventToCanvasPoint } from "@/utils";
 import { LiveObject } from "@liveblocks/client";
-import { useMutation, useStorage } from "@liveblocks/react";
+import { useMutation, useSelf, useStorage } from "@liveblocks/react";
 import { nanoid } from 'nanoid';
 import { useCallback, useState } from "react";
 import ToolsBar from "../toolsbar.tsx/ToolsBar";
@@ -31,7 +31,8 @@ const Canvas = () => {
         mode: CanvasMode.None,
     });
 
-
+    // for pencil tool
+    const pencilDrag = useSelf((me) => me.presence.pencilDraft)
 
     // to handle the insertion of a rectangle layer on click of mouse
     const insertLayer = useMutation(
@@ -118,7 +119,9 @@ const Canvas = () => {
             } else if (canvasState.mode === CanvasMode.Inserting) {
                 insertLayer(canvasState.layerType, point);
             } else if (canvasState.mode === CanvasMode.Dragging) {
+                // this state is set after the mouse is stopped moving
                 setState({ mode: CanvasMode.Dragging, origin: null });
+
             } else if (canvasState.mode === CanvasMode.Pencil) {
                 // insertPath();
             } else {
@@ -140,22 +143,7 @@ const Canvas = () => {
     }, []);
 
 
-    const onPointerDown = useMutation(
-        ({ }, e: React.PointerEvent) => {
-            const point = pointerEventToCanvasPoint(e, camera);
 
-            if (canvasState.mode === CanvasMode.Dragging) {
-                setState({ mode: CanvasMode.Dragging, origin: point });
-                return;
-            }
-
-            if (canvasState.mode === CanvasMode.Inserting) return;
-
-
-            setState({ origin: point, mode: CanvasMode.Pressing });
-        },
-        [camera, canvasState.mode, setState],
-    );
 
     const startMultiSelection = useCallback((current: Point, origin: Point) => {
         if (Math.abs(current.x - origin.x) + Math.abs(current.y - origin.y) > 5) {
@@ -184,6 +172,58 @@ const Canvas = () => {
         [layerIds],
     );
 
+    // for drawing, when pencil mode is active
+    const startDrawing = useMutation(
+        ({ setMyPresence }, point: Point, pressure: number) => {
+            setMyPresence({
+                pencilDraft: [[point.x, point.y, pressure]],
+                penColor: { r: 217, g: 217, b: 217 },
+            });
+        },
+        [],
+    );
+
+    // for drawing, when pencil mode is active
+    const continueDrawing = useMutation(
+        ({ self, setMyPresence }, point: Point, e: React.PointerEvent) => {
+            const { pencilDraft } = self.presence;
+
+            if (
+                canvasState.mode !== CanvasMode.Pencil ||
+                e.buttons !== 1 ||
+                pencilDraft === null
+            ) {
+                return;
+            }
+
+            setMyPresence({
+                cursor: point,
+                pencilDraft: [...pencilDraft, [point.x, point.y, e.pressure]],
+            });
+        },
+        [canvasState.mode],
+    );
+
+    const onPointerDown = useMutation(
+        ({ }, e: React.PointerEvent) => {
+            const point = pointerEventToCanvasPoint(e, camera);
+
+            if (canvasState.mode === CanvasMode.Dragging) {
+                setState({ mode: CanvasMode.Dragging, origin: point });
+                return;
+            }
+
+            if (canvasState.mode === CanvasMode.Inserting) return;
+
+            if (canvasState.mode === CanvasMode.Pencil) {
+                startDrawing(point, e.pressure)
+            }
+
+            setState({ origin: point, mode: CanvasMode.Pressing });
+        },
+        [camera, canvasState.mode, setState],
+    );
+
     const onPointerMove = useMutation(
         ({ setMyPresence }, e: React.PointerEvent) => {
             const point = pointerEventToCanvasPoint(e, camera);
@@ -206,7 +246,7 @@ const Canvas = () => {
             } else if (canvasState.mode === CanvasMode.Translating) {
                 // translateSelectedLayers(point);
             } else if (canvasState.mode === CanvasMode.Pencil) {
-                // continueDrawing(point, e);
+                continueDrawing(point, e);
             } else if (canvasState.mode === CanvasMode.Resizing) {
                 // resizeSelectedLayer(point);
             }
