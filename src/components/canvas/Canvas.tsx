@@ -1,7 +1,7 @@
 'use client'
 
 import { Camera, CanvasMode, CanvasState, EllipseLayer, Layer, LayerType, Point, TextLayer } from "@/types/types";
-import { colorToCss, pointerEventToCanvasPoint } from "@/utils";
+import { colorToCss, penPointsToPathPayer, pointerEventToCanvasPoint } from "@/utils";
 import { LiveObject } from "@liveblocks/client";
 import { useMutation, useSelf, useStorage } from "@liveblocks/react";
 import { nanoid } from 'nanoid';
@@ -123,7 +123,7 @@ const Canvas = () => {
                 setState({ mode: CanvasMode.Dragging, origin: null });
 
             } else if (canvasState.mode === CanvasMode.Pencil) {
-                // insertPath();
+                insertPath();
             } else {
                 setState({ mode: CanvasMode.None });
             }
@@ -131,6 +131,34 @@ const Canvas = () => {
         },
         [canvasState, setState, history, insertLayer],
     );
+
+    // insert path to liveblocks after finish drawing with penicl
+    const insertPath = useMutation(({ storage, self, setMyPresence }) => {
+        const liveLayers = storage.get("layers");
+        const { pencilDraft } = self.presence;
+
+        if (
+            pencilDraft === null ||
+            pencilDraft.length < 2 ||
+            liveLayers.size >= MAX_LAYERS
+        ) {
+            setMyPresence({ pencilDraft: null });
+            return;
+        }
+        const id = nanoid(); 
+        liveLayers.set(
+            id,
+            new LiveObject(
+                penPointsToPathPayer(pencilDraft, { r: 217, g: 217, b: 217 }),
+            ),
+        );
+
+        const liveLayerIds = storage.get("layerIds");
+        liveLayerIds.push(id);
+        setMyPresence({ pencilDraft: null });
+        setState({ mode: CanvasMode.Pencil });
+    }, []);
+
 
 
     // on wheel
@@ -190,8 +218,8 @@ const Canvas = () => {
 
             if (
                 canvasState.mode !== CanvasMode.Pencil ||
-                e.buttons !== 1 ||
-                pencilDraft === null
+                e.buttons !== 1 || // when the left mouse button is not pressed
+                pencilDraft === null // when we haven't started drawing yet
             ) {
                 return;
             }
@@ -251,7 +279,7 @@ const Canvas = () => {
                 // resizeSelectedLayer(point);
             }
             setMyPresence({ cursor: point });
-        }, []
+        }, [canvasState, setState, insertLayer, continueDrawing]
     )
 
     return (
